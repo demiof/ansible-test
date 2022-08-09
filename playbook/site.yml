@@ -1,0 +1,73 @@
+---
+
+
+
+  - name: Install python and etc on el  
+    hosts: el 
+    gather_facts: no
+
+    pre_tasks:
+    - name: Packet manager update
+      raw: cd /etc/yum.repos.d/ && sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* && sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* && yum update -y
+
+    - name: Install python and etc on el
+      raw: yum -y install {{ item }}
+      loop: [ 'python3-pip', 'virtualenv', 'python3-setuptools', 'ca-certificates', 'curl' ]
+
+  - name: Install python and etc on deb
+    hosts: deb 
+    gather_facts: no
+
+    pre_tasks:
+    - name: Packet manager update
+      raw: apt update -y
+
+    - name: Install python and etc on deb
+      raw: apt -y install {{ item }}
+      loop: [ 'python3-pip', 'virtualenv', 'python3-setuptools', 'ca-certificates', 'curl' ]
+
+  - name: Pull, create and run fedora containers
+    hosts: this
+    gather_facts: no
+    connection: local
+    tasks:
+    - name: Pull an image
+      community.docker.docker_image:
+        name: "{{img_name}}"
+        source: pull
+        pull:
+          platform: amd64
+
+    - name: Create & start container
+      # community.docker.docker_container:
+      #   name: fedora
+      #   container_default_behavior: compatibility
+      #   state: started
+      #   image: "{{img-name}}"
+      #   command: /bin/bash
+      #   restart_policy: on-failure
+      #   detach: yes
+      local_action: command ./start_fedora.sh {{img_name}} 
+      register: container_id
+    
+    - name: print container_id variable
+      ansible.builtin.debug:
+        var: container_id.stdout
+
+  - name: Print os facts
+    hosts: all
+    connection: local
+    tasks:
+    
+    - name: Print OS
+      debug:
+        msg: "{{ ansible_distribution }}"
+    
+    - name: Print fact
+      debug:
+        msg: "{{ some_fact }}"
+
+    - name: Print pw
+      debug:
+        msg: "{{ pw }}"
+      

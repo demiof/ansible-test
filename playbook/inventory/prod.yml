@@ -1,0 +1,32 @@
+---
+  el:
+    hosts:
+      centos7:
+        ansible_host: xenodochial_meninsky
+        ansible_connection: docker
+        ansible_user: root
+        ansible_become: yes
+        ansible_python_interpreter: /usr/bin/python3
+
+        
+  deb:
+    hosts:
+      ubuntu:
+        ansible_host: wizardly_ganguly
+        ansible_connection: docker
+        ansible_user: root
+        ansible_become: yes
+        ansible_python_interpreter: /usr/bin/python3
+  
+  local:
+    hosts:
+      dev:
+        ansible_connection: local
+
+  
+
+      
+
+
+        
+
